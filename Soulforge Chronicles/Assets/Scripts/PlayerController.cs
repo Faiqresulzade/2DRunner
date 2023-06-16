@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,28 +22,32 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (Physics2D.Raycast(transform.position, Vector2.down, 5f, layer) && Input.GetKeyDown(KeyCode.Space))
+        if (Physics2D.Raycast(transform.position, Vector2.down, 5f, layer) && Input.GetMouseButtonDown(0))
         {
             _rigidbody.AddForce(new Vector2(0f, _jumpForce), ForceMode2D.Impulse);
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.transform.CompareTag("Coin"))
         {
+            collision.gameObject.SetActive(false);
             _coinCount++;
             UiManager.instance.ChangeCoin(_coinCount);
-            collision.gameObject.SetActive(false);
         }
         if (collision.transform.CompareTag("Rock"))
         {
 
+            collision.gameObject.SetActive(false);
             _coinCount -= 4;
+            if (_coinCount < 0)
+            {
+                SceneManager.LoadScene(0);
+            }
             UiManager.instance.ChangeCoin(_coinCount);
             _animator.SetBool("HelthLoss", true);
             StartCoroutine(HealthLoss());
-            collision.gameObject.SetActive(false);
 
         }
     }
